@@ -116,11 +116,11 @@ print(camino)
 distancia = 0
 for i in range(len(camino) - 1):
     distancia += g.nodos[camino[i]].distancia
-print(distancia)
+print("La distancia es de:" ,distancia, "km")
 
 # calcular tiempo
 tiempo = distancia / 2
-print(tiempo)
+print("El tiempo es de:" ,tiempo, "min")
 
 # calcular costo
 costo = 0
@@ -129,35 +129,35 @@ for i in range(len(camino) - 1):
         costo += 2
     else:
         costo += 1
-print(costo)
+print("El coste es de:" ,costo, "£")
 
 # calcular cantidad de desvios
 desvios = 0
 for i in range(len(camino) - 1):
     if g.nodos[camino[i]].tipo == "desvio":
         desvios += 1
-print(desvios)
+print("Ha tomado:" ,desvios, "desvios")
 
 # calcular cantidad de estaciones
 estaciones = 0
 for i in range(len(camino) - 1):
     if g.nodos[camino[i]].tipo == "estacion":
         estaciones += 1
-print(estaciones)
+print("Ha tomado:" ,estaciones, "estaciones")
 
 # calcular cantidad de cruces
 cruces = 0
 for i in range(len(camino) - 1):
     if g.nodos[camino[i]].tipo == "estacion" and g.nodos[camino[i + 1]].tipo == "estacion":
         cruces += 1
-print(cruces)
+print("Ha tomado:" ,cruces, "cruces")
 
 # calcular cantidad de cambios de sentido
 cambios = 0
 for i in range(len(camino) - 1):
     if g.nodos[camino[i]].tipo == "desvio" and g.nodos[camino[i + 1]].tipo == "desvio":
         cambios += 1
-print(cambios)
+print("Ha tomado:" ,cambios, "cambios de sentido")
 
 # calcular cantidad de cambios de sentido en estaciones
 cambios_estaciones = 0
@@ -165,7 +165,7 @@ for i in range(len(camino) - 1):
     if g.nodos[camino[i]].tipo == "desvio" and g.nodos[camino[i + 1]].tipo == "desvio":
         if g.nodos[camino[i - 1]].tipo == "estacion" and g.nodos[camino[i + 2]].tipo == "estacion":
             cambios_estaciones += 1
-print(cambios_estaciones)
+print("Ha tomado:" ,cambios_estaciones, "cambios de sentido en estaciones")
 
 # calcular cantidad de cambios de sentido en desvios
 cambios_desvios = 0
@@ -173,7 +173,7 @@ for i in range(len(camino) - 1):
     if g.nodos[camino[i]].tipo == "desvio" and g.nodos[camino[i + 1]].tipo == "desvio":
         if g.nodos[camino[i - 1]].tipo == "desvio" and g.nodos[camino[i + 2]].tipo == "desvio":
             cambios_desvios += 1
-print(cambios_desvios)
+print("Ha tomado:", cambios_desvios, "cambios de sentido en desvios")
 
 # calcular cantidad de cambios de sentido en estaciones y desvios
 cambios_mixtos = 0
@@ -183,4 +183,4 @@ for i in range(len(camino) - 1):
             cambios_mixtos += 1
         elif g.nodos[camino[i - 1]].tipo == "desvio" and g.nodos[camino[i + 2]].tipo == "estacion":
             cambios_mixtos += 1
-print(cambios_mixtos)
+print("Ha tomado:", cambios_mixtos, "cambios de sentido en estaciones y desvios")
