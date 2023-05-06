@@ -1,6 +1,4 @@
 import heapq
-from collections import defaultdict
-
 # Datos iniciales
 caracter_cantidad = {
     'A': 11, 'B': 2, 'C': 4, 'D': 3, 'E': 14, 'G': 3, 'I': 6, 'L': 6,
