@@ -1,92 +1,64 @@
-class Node:
-    def __init__(self, char=None, freq=None, left=None, right=None):
-        self.char = char
-        self.freq = freq
-        self.left = left
-        self.right = right
-        
-    def is_leaf(self):
-        return self.left is None and self.right is None
+import heapq
+from collections import defaultdict
 
+# Datos iniciales
+caracter_cantidad = {
+    'A': 11, 'B': 2, 'C': 4, 'D': 3, 'E': 14, 'G': 3, 'I': 6, 'L': 6,
+    'M': 3, 'N': 6, 'O': 7, 'P': 4, 'Q': 1, 'R': 10, 'S': 4, 'T': 3,
+    'U': 4, 'V': 2, ' ': 17, ',': 2
+}
 
-def build_huffman_tree(freq_dict):
-    nodes = [Node(char=char, freq=freq) for char, freq in freq_dict.items()]
-    
-    while len(nodes) > 1:
-        nodes = sorted(nodes, key=lambda x: (x.freq, x.char))
-        left_node = nodes.pop(0)
-        right_node = nodes.pop(0)
-        parent_node = Node(char=None, freq=left_node.freq+right_node.freq, left=left_node, right=right_node)
-        nodes.append(parent_node)
-        
-    return nodes[0]
-        
+# Calcular frecuencias
+total_caracteres = sum(caracter_cantidad.values())
+frecuencias = {caracter: cantidad / total_caracteres for caracter, cantidad in caracter_cantidad.items()}
 
-def generate_codes(node, prefix="", code_dict={}):
-    if node.is_leaf():
-        code_dict[node.char] = prefix
-    else:
-        generate_codes(node.left, prefix+"0", code_dict)
-        generate_codes(node.right, prefix+"1", code_dict)
-        
-    return code_dict
+# Crear árbol de Huffman
+def crear_arbol_huffman(frecuencias):
+    heap = [[peso, [caracter, ""]] for caracter, peso in frecuencias.items()]
+    heapq.heapify(heap)
+    while len(heap) > 1:
+        lo = heapq.heappop(heap)
+        hi = heapq.heappop(heap)
+        for pair in lo[1:]:
+            pair[1] = '0' + pair[1]
+        for pair in hi[1:]:
+            pair[1] = '1' + pair[1]
+        heapq.heappush(heap, [lo[0] + hi[0]] + lo[1:] + hi[1:])
+    return heap[0]
 
+huffman_tree = crear_arbol_huffman(frecuencias)
+huffman_codes = {caracter: code for caracter, code in huffman_tree[1:]}
 
-def encode(message, code_dict):
-    encoded_message = ""
-    for char in message:
-        encoded_message += code_dict[char]
-        
-    return encoded_message
+# Descomprimir mensajes
+mensaje1 = "100010111010110000101110100011100000110110000001111001111010010110000110100111001101000101110101111111010000111100111111001111010001100011000000101101011110111111110111010110110111001110110111100111111100101001010010100000101101011000101100110100011100100101100001100100011010110101011111111111011011101110010000100101011000111111100010001110110011001011010001101111101011010001101110000000111001001010100011111100011001011010111001100111101000110001100000010110101111100111001"
+mensaje2 = "0110101011011100101000111101011100110111010110110100001000111010100101111010011111110111001010001111010111001101110101100001100010011010001110010010001100010110011001110010010000111101111010"
 
+def descomprimir_mensaje(mensaje, huffman_tree):
+    resultado = ""
+    codigo_actual = ""
+    diccionario_codigos = {code: caracter for caracter, code in huffman_tree[1:]}
+    for bit in mensaje:
+        codigo_actual += bit
+        if codigo_actual in diccionario_codigos:
+            resultado += diccionario_codigos[codigo_actual]
+            codigo_actual = ""
+    return resultado
 
-def decode(encoded_message, tree):
-    message = ""
-    node = tree
-    for bit in encoded_message:
-        if bit == "0":
-            node = node.left
-        else:
-            node = node.right
-        if node.is_leaf():
-            message += node.char
-            node = tree
-    
-    return message
+# Descomprimir mensajes
+mensaje1_descomprimido = descomprimir_mensaje(mensaje1, huffman_tree)
+mensaje2_descomprimido = descomprimir_mensaje(mensaje2, huffman_tree)
 
+print("Mensaje 1 descomprimido:", mensaje1_descomprimido)
+print("Mensaje 2 descomprimido:", mensaje2_descomprimido)
 
-if __name__ == "__main__":
-    # Frecuencia de los caracteres
-    frequency = {'A': 11, 'B': 2, 'C': 4, 'D': 3, 'E': 14, 'G': 3, 'I': 6, 'L': 6, 'M': 3, 'N': 6, 'O': 7, 'P': 4, 'Q': 1, 'R': 10, 'S': 4, 'T': 3, 'U': 4, 'V': 2, ' ': 17, ',': 2}
-    # Construir el árbol de Huffman
-    huffman_tree = build_huffman_tree(frequency)
-    # Imprimir el código Huffman para cada carácter
-    huffman_code = build_huffman_tree(huffman_tree)
-    print("Tabla de código Huffman:")
-    print(huffman_code)
+# Calcular espacio de memoria
+def calcular_espacio_memoria(mensaje_original, mensaje_comprimido):
+    espacio_original = len(mensaje_original) * 8  # 8 bits por cada caracter
+    espacio_comprimido = len(mensaje_comprimido)
+    return espacio_original, espacio_comprimido
 
-#Tabla de código Huffman:
-A : 110
-B : 11111111110
-C : 1111111100
-D : 1111111110
-E : 0
-G : 1111111101
-I : 111101
-L : 111100
-M : 1111111011
-N : 111110
-O : 101
-P : 111111100
-Q : 11111111111
-R : 100
-S : 1111111010
-T : 1111111000
-U : 11111111101
-V : 1111111111
-'' : 10
-"," : 11111111100
+espacio_mensaje1 = calcular_espacio_memoria(mensaje1_descomprimido, mensaje1)
+espacio_mensaje2 = calcular_espacio_memoria(mensaje2_descomprimido, mensaje2)
 
-mensaje_cifrado = “10001011101011000010111010001110000011011000000111100111101001011000011010011100110100010111010111111101000011110011111100111101000110001100000010110101111011111110111010110110111001110110111100111111100101001010010100000101101011000101100110100011100100101100001100100011010110101011111111111011011101110010000100101011000111111100010001110110011001011010001101111101011010001101110000000111001001010100011111100001100101101011100110011110100011000110000001011010111110011100”
-mensaje_decodificado = decode(mensaje_cifrado, huffman_tree)
-print(mensaje_decodificado)
+print("Espacio de memoria mensaje 1 (original, comprimido):", espacio_mensaje1)
+print("Espacio de memoria mensaje 2 (original, comprimido):", espacio_mensaje2)
