@@ -49,8 +49,6 @@ def newton_raphson(f, df, x0, tol=1e-6, max_iter=100):
     print("Error: se alcanzó el número máximo de iteraciones")
     return None
 
-import math
-
 def f(x):
     return x**3 + x + 16
 
